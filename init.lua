@@ -273,15 +273,18 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 vim.api.nvim_create_autocmd("VimResized", {
   callback = function()
     vim.cmd("wincmd =")  -- Equalize windows
-    -- Re-detect screen size and adjust settings
+    -- Re-detect screen size and adjust settings dynamically
     local new_cols = vim.o.columns
-    if new_cols < 80 and not is_phone then
-      -- Switched to phone mode
+    local new_lines = vim.o.lines
+    local was_phone = new_cols < 80 or new_lines < 30
+
+    if was_phone then
+      -- Phone mode
       vim.o.number = false
       vim.o.signcolumn = "no"
       vim.o.laststatus = 1
-    elseif new_cols >= 80 and is_phone then
-      -- Switched from phone mode
+    else
+      -- Desktop/tablet mode
       vim.o.number = true
       vim.o.signcolumn = "yes:1"
       vim.o.laststatus = 2
@@ -481,11 +484,10 @@ require('lazy').setup({
 
       -- ============================================================================
       -- MERGED: Additional convenience keymaps
+      -- Note: <leader>f is used by conform.nvim for formatting
+      -- Note: <leader>h is used for Git Hunk group by which-key
+      -- Note: <leader>sf, <leader>sg, <leader>b are already mapped above
       -- ============================================================================
-      vim.keymap.set('n', '<leader>f', builtin.find_files, { desc = 'Find files' })
-      vim.keymap.set('n', '<leader>g', builtin.live_grep, { desc = 'Live grep' })
-      vim.keymap.set('n', '<leader>b', builtin.buffers, { desc = 'Find buffers' })
-      vim.keymap.set('n', '<leader>h', builtin.help_tags, { desc = 'Help tags' })
 
       -- This runs on LSP attach per buffer (see main LSP attach function in 'neovim/nvim-lspconfig' config for more info,
       -- it is better explained there). This allows easily switching between pickers if you prefer using something else!
@@ -719,10 +721,29 @@ require('lazy').setup({
           },
         },
 
-        -- Swift (requires sourcekit-lsp to be installed)
+        -- Swift with enhanced sourcekit-lsp configuration
         sourcekit = {
-          cmd = { "sourcekit-lsp" },
-          filetypes = { "swift" },
+          cmd = { "/home/dave/.local/swift/usr/bin/sourcekit-lsp" },
+          cmd_env = {
+            LD_LIBRARY_PATH = "/home/dave/.local/lib:" .. (vim.env.LD_LIBRARY_PATH or ""),
+          },
+          filetypes = { "swift", "objc", "objcpp" },
+          root_dir = function(filename)
+            -- Use vim.fs.root for better compatibility with newer nvim API
+            local markers = { 'Package.swift', '.git' }
+            local root = vim.fs.root(0, markers)
+            return root or vim.fn.getcwd()
+          end,
+          settings = {
+            sourcekit = {
+              -- Enable semantic highlighting
+              semanticHighlighting = true,
+              -- Customize indexing
+              indexing = {
+                enabled = true,
+              },
+            },
+          },
         },
 
         -- JavaScript/TypeScript
@@ -747,18 +768,19 @@ require('lazy').setup({
       --    :Mason
       --
       --  You can press `g?` for help in this menu.
-      local ensure_installed = vim.tbl_keys(servers or {})
-      vim.list_extend(ensure_installed, {
-        'lua_ls', -- Lua Language server
-        'stylua', -- Used to format Lua code
-        -- You can add other tools here that you want Mason to install
-        -- ============================================================================
-        -- MERGED: Additional formatters for mobile development languages
-        -- ============================================================================
-        'black',      -- Python formatter
-        'gofumpt',    -- Go formatter
-        'prettier',   -- JS/TS/Markdown formatter
-      })
+      -- Note: Use Mason package names, not lspconfig names
+      -- sourcekit is excluded (installed separately with Swift toolchain)
+      local ensure_installed = {
+        'lua-language-server', -- Lua Language server (lspconfig name: lua_ls)
+        'stylua',              -- Used to format Lua code
+        'pyright',             -- Python LSP
+        'gopls',               -- Go LSP
+        'typescript-language-server', -- TypeScript/JavaScript LSP (lspconfig name: ts_ls)
+        'marksman',            -- Markdown LSP
+        'black',               -- Python formatter
+        'gofumpt',             -- Go formatter
+        'prettier',            -- JS/TS/Markdown formatter
+      }
 
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -794,6 +816,44 @@ require('lazy').setup({
         },
       })
       vim.lsp.enable 'lua_ls'
+
+      -- ============================================================================
+      -- Swift LSP Auto-start
+      -- Since sourcekit is not managed by Mason, we use an autocommand to start it
+      -- ============================================================================
+      vim.api.nvim_create_autocmd('FileType', {
+        pattern = { 'swift', 'objc', 'objcpp' },
+        callback = function(args)
+          -- Check if sourcekit-lsp is already attached to this buffer
+          local clients = vim.lsp.get_clients({ bufnr = args.buf, name = 'sourcekit' })
+          if #clients > 0 then
+            return  -- Already attached
+          end
+
+          -- Find root directory
+          local root_markers = { 'Package.swift', '.git' }
+          local root = vim.fs.root(args.buf, root_markers) or vim.fn.getcwd()
+
+          -- Start sourcekit-lsp
+          vim.lsp.start({
+            name = 'sourcekit',
+            cmd = { '/home/dave/.local/swift/usr/bin/sourcekit-lsp' },
+            cmd_env = {
+              LD_LIBRARY_PATH = '/home/dave/.local/lib:' .. (vim.env.LD_LIBRARY_PATH or ''),
+            },
+            root_dir = root,
+            capabilities = capabilities,
+            filetypes = { 'swift', 'objc', 'objcpp' },
+            settings = {
+              sourcekit = {
+                semanticHighlighting = true,
+                indexing = { enabled = true },
+              },
+            },
+          }, { bufnr = args.buf })
+        end,
+        desc = 'Start sourcekit-lsp for Swift files',
+      })
     end,
   },
 
@@ -807,14 +867,6 @@ require('lazy').setup({
         function() require('conform').format { async = true, lsp_format = 'fallback' } end,
         mode = '',
         desc = '[F]ormat buffer',
-      },
-      -- ============================================================================
-      -- MERGED: Additional format keymap
-      -- ============================================================================
-      {
-        '<leader>F',
-        function() require('conform').format({ async = true, lsp_format = 'fallback' }) end,
-        desc = 'Format buffer',
       },
     },
     opts = {
@@ -1000,14 +1052,6 @@ require('lazy').setup({
       --  You could remove this setup call if you don't like it,
       --  and try some other statusline plugin
       local statusline = require 'mini.statusline'
-      -- set use_icons to true if you have a Nerd Font
-      statusline.setup { use_icons = vim.g.have_nerd_font }
-
-      -- You can configure sections in the statusline by overriding their
-      -- default behavior. For example, here we set the section for
-      -- cursor location to LINE:COLUMN
-      ---@diagnostic disable-next-line: duplicate-set-field
-      statusline.section_location = function() return '%2l:%-2v' end
 
       -- ============================================================================
       -- MERGED: Mobile-responsive statusline configuration
@@ -1053,20 +1097,22 @@ require('lazy').setup({
 
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
-    config = function()
-      local filetypes = { 
+    build = ':TSUpdate',
+    main = 'nvim-treesitter.configs',
+    opts = {
+      ensure_installed = {
         'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc',
         -- ============================================================================
         -- MERGED: Additional treesitter parsers for mobile development
+        -- Note: Swift parser has compatibility issues with tree-sitter 0.26+
+        -- LSP provides syntax support, tree-sitter optional
         -- ============================================================================
-        'python', 'go', 'swift', 'javascript', 'typescript',
-      }
-      require('nvim-treesitter').install(filetypes)
-      vim.api.nvim_create_autocmd('FileType', {
-        pattern = filetypes,
-        callback = function() vim.treesitter.start() end,
-      })
-    end,
+        'python', 'go', 'javascript', 'typescript',
+      },
+      auto_install = false,  -- Disabled to prevent Swift parser install issues
+      highlight = { enable = true },
+      indent = { enable = true },
+    },
   },
 
   -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
