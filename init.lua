@@ -1,21 +1,22 @@
 --[[
+
 =====================================================================
 ==================== READ THIS BEFORE CONTINUING ====================
 =====================================================================
-======                    .-----.                        ========
-======                   .------.                        ========
-======   .-""""""""""""""""""-.| |-----|                 ========
-======   ||                  || | === |                 ========
-======   ||   KICKSTART.NVIM || |-----|                 ========
-======   ||                  || | === |                 ========
-======   ||                  || |-----|                 ========
-======   ||:Tutor            || |:::::|                 ========
-======   |'-..................-'| |_____o|               ========
-======   `"")-----(""` ___________                      ========
-======  /::::::::::::|  |:::::::::::\  \ no mouse \     ========
-======  /:::========|  |==hjkl==:::\  \ required \     ========
-======  '""""""""""""'  '""""""""""""'  '""""""""""'    ========
-======                                                   ========
+========                                    .-----.          ========
+========         .----------------------.   | === |          ========
+========         |.-""""""""""""""""""-.|   |-----|          ========
+========         ||                    ||   | === |          ========
+========         ||   KICKSTART.NVIM   ||   |-----|          ========
+========         ||                    ||   | === |          ========
+========         ||                    ||   |-----|          ========
+========         ||:Tutor              ||   |:::::|          ========
+========         |'-..................-'|   |____o|          ========
+========         `"")----------------(""`   ___________      ========
+========        /::::::::::|  |::::::::::\  \ no mouse \     ========
+========       /:::========|  |==hjkl==:::\  \ required \    ========
+========      '""""""""""""'  '""""""""""""'  '""""""""""'   ========
+========                                                     ========
 =====================================================================
 =====================================================================
 
@@ -37,8 +38,8 @@ What is Kickstart?
 
     After understanding a bit more about Lua, you can use `:help lua-guide` as a
     reference for how Neovim integrates Lua.
-      - :help lua-guide
-      - (or HTML version): https://neovim.io/doc/user/lua-guide.html
+    - :help lua-guide
+    - (or HTML version): https://neovim.io/doc/user/lua-guide.html
 
 Kickstart Guide:
 
@@ -62,25 +63,25 @@ Kickstart Guide:
     This should be the first place you go to look when you're stuck or confused
     with something. It's one of my favorite Neovim features.
 
-  MOST IMPORTANTLY, we provide a keymap "<space>sh" to [s]earch the [h]elp documentation,
-  which is very useful when you're not exactly sure of what you're looking for.
+    MOST IMPORTANTLY, we provide a keymap "<space>sh" to [s]earch the [h]elp documentation,
+    which is very useful when you're not exactly sure of what you're looking for.
 
   I have left several `:help X` comments throughout the init.lua
     These are hints about where to find more information about the relevant settings,
     plugins or Neovim features used in Kickstart.
 
-     NOTE: Look for lines like this
+   NOTE: Look for lines like this
 
     Throughout the file. These are for you, the reader, to help you understand what is happening.
     Feel free to delete them once you know what you're doing, but they should serve as a guide
     for when you are first encountering a few different constructs in your Neovim config.
 
-  If you experience any errors while trying to install kickstart, run `:checkhealth` for more info.
+If you experience any errors while trying to install kickstart, run `:checkhealth` for more info.
 
-  I hope you enjoy your Neovim journey,
-    - TJ
+I hope you enjoy your Neovim journey,
+- TJ
 
-  P.S. You can delete this when you're done too. It's your config now! :)
+P.S. You can delete this when you're done too. It's your config now! :)
 --]]
 
 -- Set <space> as the leader key
@@ -92,11 +93,7 @@ vim.g.maplocalleader = ' '
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
 
--- ============================================================================
--- [[ MERGED: Mobile-Responsive Options ]]
--- The following section adds mobile/tablet detection and responsive UI settings
--- ============================================================================
--- Detect screen size and optimize accordingly
+-- Mobile/tablet screen detection
 local cols = vim.o.columns
 local lines = vim.o.lines
 local is_phone = cols < 80 or lines < 30
@@ -108,9 +105,7 @@ local is_tablet = cols >= 80 and cols < 120
 --  For more options, you can see `:help option-list`
 
 -- Make line numbers default
--- MERGED: Conditionally disabled on phone screens
 vim.o.number = not is_phone
-
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
 -- vim.o.relativenumber = true
@@ -154,10 +149,10 @@ vim.o.splitbelow = true
 --  See `:help 'list'`
 --  and `:help 'listchars'`
 --
--- Notice listchars is set using `vim.opt` instead of `vim.o`.
+--  Notice listchars is set using `vim.opt` instead of `vim.o`.
 --  It is very similar to `vim.o` but offers an interface for conveniently interacting with tables.
---  See `:help lua-options`
---  and `:help lua-guide-options`
+--   See `:help lua-options`
+--   and `:help lua-guide-options`
 vim.o.list = true
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 
@@ -172,34 +167,28 @@ vim.o.scrolloff = 10
 
 -- if performing an operation that would fail due to unsaved changes in the buffer (like `:q`),
 -- instead raise a dialog asking if you wish to save the current file(s)
---  See `:help 'confirm'`
+-- See `:help 'confirm'`
 vim.o.confirm = true
 
--- ============================================================================
--- [[ MERGED: Mobile-specific UI optimizations ]]
--- Additional responsive settings based on screen size
--- ============================================================================
+-- Mobile-specific UI optimizations
 if is_phone then
-  -- iPhone: Maximize screen real estate
-  vim.o.signcolumn = "no"      -- No sign column
-  vim.o.foldcolumn = "0"       -- No fold column
-  vim.o.laststatus = 1         -- Hide statusline when only one window
-  vim.o.cmdheight = 1          -- Minimal command height
-  vim.o.list = false           -- Hide whitespace characters
-  vim.o.cursorline = false     -- Disable cursor line highlight
-  vim.o.scrolloff = 5          -- Reduced scrolloff for mobile
+  vim.o.signcolumn = 'no'
+  vim.o.foldcolumn = '0'
+  vim.o.laststatus = 1
+  vim.o.cmdheight = 1
+  vim.o.list = false
+  vim.o.cursorline = false
+  vim.o.scrolloff = 5
 elseif is_tablet then
-  -- iPad: Balanced approach
-  vim.o.signcolumn = "yes:1"   -- Single-width sign column
-  vim.o.foldcolumn = "1"       -- Single-width fold column
-  vim.o.laststatus = 2         -- Always show statusline
-  vim.opt.listchars = { tab = '» ', trail = '·' }  -- Minimal whitespace chars
-  vim.o.scrolloff = 5          -- Reduced scrolloff for mobile
+  vim.o.signcolumn = 'yes:1'
+  vim.o.foldcolumn = '1'
+  vim.o.laststatus = 2
+  vim.opt.listchars = { tab = '» ', trail = '·' }
+  vim.o.scrolloff = 5
 else
-  -- Desktop/large screen: Full features
   vim.o.relativenumber = true
-  vim.o.signcolumn = "yes:2"
-  vim.o.foldcolumn = "2"
+  vim.o.signcolumn = 'yes:2'
+  vim.o.foldcolumn = '2'
 end
 
 -- [[ Basic Keymaps ]]
@@ -216,9 +205,11 @@ vim.diagnostic.config {
   severity_sort = true,
   float = { border = 'rounded', source = 'if_many' },
   underline = { severity = vim.diagnostic.severity.ERROR },
+
   -- Can switch between these as you prefer
   virtual_text = true, -- Text shows up at the end of the line
   virtual_lines = false, -- Text shows up underneath the line, with virtual lines
+
   -- Auto open the float, so you can easily read the errors when jumping with `[d` and `]d`
   jump = { float = true },
 }
@@ -266,27 +257,20 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   callback = function() vim.hl.on_yank() end,
 })
 
--- ============================================================================
--- [[ MERGED: Auto-resize windows on terminal resize ]]
--- Important for mobile devices when rotating screen or changing window size
--- ============================================================================
-vim.api.nvim_create_autocmd("VimResized", {
+-- Auto-resize windows on terminal resize (useful for mobile screen rotation)
+vim.api.nvim_create_autocmd('VimResized', {
   callback = function()
-    vim.cmd("wincmd =")  -- Equalize windows
-    -- Re-detect screen size and adjust settings dynamically
+    vim.cmd 'wincmd ='
     local new_cols = vim.o.columns
     local new_lines = vim.o.lines
-    local was_phone = new_cols < 80 or new_lines < 30
-
-    if was_phone then
-      -- Phone mode
+    local now_phone = new_cols < 80 or new_lines < 30
+    if now_phone then
       vim.o.number = false
-      vim.o.signcolumn = "no"
+      vim.o.signcolumn = 'no'
       vim.o.laststatus = 1
     else
-      -- Desktop/tablet mode
       vim.o.number = true
-      vim.o.signcolumn = "yes:1"
+      vim.o.signcolumn = 'yes:1'
       vim.o.laststatus = 2
     end
   end,
@@ -299,7 +283,9 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
   local lazyrepo = 'https://github.com/folke/lazy.nvim.git'
   local out = vim.fn.system { 'git', 'clone', '--filter=blob:none', '--branch=stable', lazyrepo, lazypath }
   if vim.v.shell_error ~= 0 then error('Error cloning lazy.nvim:\n' .. out) end
-end ---@type vim.Option
+end
+
+---@type vim.Option
 local rtp = vim.opt.rtp
 rtp:prepend(lazypath)
 
@@ -320,14 +306,14 @@ require('lazy').setup({
 
   -- Alternatively, use `config = function() ... end` for full control over the configuration.
   -- If you prefer to call `setup` explicitly, use:
-  --  {
-  --    'lewis6991/gitsigns.nvim',
-  --    config = function()
-  --      require('gitsigns').setup({
-  --        -- Your gitsigns configuration here
-  --      })
-  --    end,
-  --  }
+  --    {
+  --        'lewis6991/gitsigns.nvim',
+  --        config = function()
+  --            require('gitsigns').setup({
+  --                -- Your gitsigns configuration here
+  --            })
+  --        end,
+  --    }
   --
   -- Here is a more advanced example where we pass configuration
   -- options to `gitsigns.nvim`.
@@ -343,9 +329,6 @@ require('lazy').setup({
         topdelete = { text = '‾' },
         changedelete = { text = '~' },
       },
-      -- ============================================================================
-      -- MERGED: Disable signcolumn on phone to save space
-      -- ============================================================================
       signcolumn = not is_phone,
     },
   },
@@ -363,6 +346,7 @@ require('lazy').setup({
   --
   -- Then, because we use the `opts` key (recommended), the configuration runs
   -- after the plugin has been loaded as `require(MODULE).setup(opts)`.
+
   { -- Useful plugin to show you pending keybinds.
     'folke/which-key.nvim',
     event = 'VimEnter',
@@ -370,6 +354,7 @@ require('lazy').setup({
       -- delay between pressing a key and opening which-key (milliseconds)
       delay = 0,
       icons = { mappings = vim.g.have_nerd_font },
+
       -- Document existing key chains
       spec = {
         { '<leader>s', group = '[S]earch', mode = { 'n', 'v' } },
@@ -389,12 +374,14 @@ require('lazy').setup({
   { -- Fuzzy Finder (files, lsp, etc)
     'nvim-telescope/telescope.nvim',
     -- By default, Telescope is included and acts as your picker for everything.
+
     -- If you would like to switch to a different picker (like snacks, or fzf-lua)
     -- you can disable the Telescope plugin by setting enabled to false and enable
     -- your replacement picker by requiring it explicitly (e.g. 'custom.plugins.snacks')
+
     -- Note: If you customize your config for yourself,
-    --       it's best to remove the Telescope plugin config entirely
-    --       instead of just disabling it here, to keep your config clean.
+    -- it's best to remove the Telescope plugin config entirely
+    -- instead of just disabling it here, to keep your config clean.
     enabled = true,
     event = 'VimEnter',
     dependencies = {
@@ -447,17 +434,13 @@ require('lazy').setup({
         --   },
         -- },
         -- pickers = {}
-        -- ============================================================================
-        -- MERGED: Mobile-optimized layout configuration
-        -- ============================================================================
         defaults = {
           layout_config = {
             height = is_phone and 0.7 or 0.8,
             width = is_phone and 0.95 or 0.8,
-            preview_cutoff = is_phone and 1 or 120,  -- Disable preview on phone
+            preview_cutoff = is_phone and 1 or 120,
           },
-          -- Faster for remote development
-          file_ignore_patterns = { "%.git/", "node_modules/", "__pycache__/" },
+          file_ignore_patterns = { '%.git/', 'node_modules/', '__pycache__/' },
         },
         extensions = {
           ['ui-select'] = { require('telescope.themes').get_dropdown() },
@@ -482,13 +465,6 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sc', builtin.commands, { desc = '[S]earch [C]ommands' })
       vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
 
-      -- ============================================================================
-      -- MERGED: Additional convenience keymaps
-      -- Note: <leader>f is used by conform.nvim for formatting
-      -- Note: <leader>h is used for Git Hunk group by which-key
-      -- Note: <leader>sf, <leader>sg, <leader>b are already mapped above
-      -- ============================================================================
-
       -- This runs on LSP attach per buffer (see main LSP attach function in 'neovim/nvim-lspconfig' config for more info,
       -- it is better explained there). This allows easily switching between pickers if you prefer using something else!
       vim.api.nvim_create_autocmd('LspAttach', {
@@ -500,25 +476,25 @@ require('lazy').setup({
           vim.keymap.set('n', 'grr', builtin.lsp_references, { buffer = buf, desc = '[G]oto [R]eferences' })
 
           -- Jump to the implementation of the word under your cursor.
-          --  Useful when your language has ways of declaring types without an actual implementation.
+          -- Useful when your language has ways of declaring types without an actual implementation.
           vim.keymap.set('n', 'gri', builtin.lsp_implementations, { buffer = buf, desc = '[G]oto [I]mplementation' })
 
           -- Jump to the definition of the word under your cursor.
-          --  This is where a variable was first declared, or where a function is defined, etc.
-          --  To jump back, press <C-t>.
+          -- This is where a variable was first declared, or where a function is defined, etc.
+          -- To jump back, press <C-t>.
           vim.keymap.set('n', 'grd', builtin.lsp_definitions, { buffer = buf, desc = '[G]oto [D]efinition' })
 
           -- Fuzzy find all the symbols in your current document.
-          --  Symbols are things like variables, functions, types, etc.
+          -- Symbols are things like variables, functions, types, etc.
           vim.keymap.set('n', 'gO', builtin.lsp_document_symbols, { buffer = buf, desc = 'Open Document Symbols' })
 
           -- Fuzzy find all the symbols in your current workspace.
-          --  Similar to document symbols, except searches over your entire project.
+          -- Similar to document symbols, except searches over your entire project.
           vim.keymap.set('n', 'gW', builtin.lsp_dynamic_workspace_symbols, { buffer = buf, desc = 'Open Workspace Symbols' })
 
           -- Jump to the type of the word under your cursor.
-          --  Useful when you're not sure what type a variable is and you want to see
-          --  the definition of its *type*, not where it was *defined*.
+          -- Useful when you're not sure what type a variable is and you want to see
+          -- the definition of its *type*, not where it was *defined*.
           vim.keymap.set('n', 'grt', builtin.lsp_type_definitions, { buffer = buf, desc = '[G]oto [T]ype Definition' })
         end,
       })
@@ -623,17 +599,6 @@ require('lazy').setup({
           --  For example, in C this would take you to the header.
           map('grD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
 
-          -- ============================================================================
-          -- MERGED: Additional LSP keymaps for mobile-friendly diagnostics
-          -- ============================================================================
-          map('gd', vim.lsp.buf.definition, 'Go to definition')
-          map('gr', vim.lsp.buf.references, 'Go to references')
-          map('gi', vim.lsp.buf.implementation, 'Go to implementation')
-          map('K', vim.lsp.buf.hover, 'Hover documentation')
-          map('<leader>rn', vim.lsp.buf.rename, 'Rename')
-          map('<leader>ca', vim.lsp.buf.code_action, 'Code action')
-          map('<leader>d', vim.diagnostic.open_float, 'Show diagnostics')
-
           -- The following two autocommands are used to highlight references of the
           -- word under your cursor when your cursor rests there for a little while.
           --    See `:help CursorHold` for information about when this is executed
@@ -683,103 +648,34 @@ require('lazy').setup({
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
       --  See `:help lsp-config` for information about keys and how to configure
       local servers = {
-        -- clangd = {},
-        -- gopls = {},
-        -- pyright = {},
-        -- rust_analyzer = {},
-        --
-        -- Some languages (like typescript) have entire language plugins that can be useful:
-        --    https://github.com/pmizio/typescript-tools.nvim
-        --
-        -- But for many setups, the LSP (`ts_ls`) will work just fine
-        -- ts_ls = {},
-
-        -- ============================================================================
-        -- MERGED: Additional language servers for mobile development
-        -- ============================================================================
         -- Python
-        pyright = {
-          settings = {
-            python = {
-              analysis = {
-                typeCheckingMode = "basic",  -- Faster than "strict"
-                autoImportCompletions = true,
-              }
-            }
-          }
-        },
-
+        pyright = {},
         -- Go
-        gopls = {
-          settings = {
-            gopls = {
-              analyses = {
-                unusedparams = true,
-              },
-              staticcheck = true,
-            },
-          },
-        },
-
-        -- Swift with enhanced sourcekit-lsp configuration
-        sourcekit = {
-          cmd = { "/home/dave/.local/swift/usr/bin/sourcekit-lsp" },
-          cmd_env = {
-            LD_LIBRARY_PATH = "/home/dave/.local/lib:" .. (vim.env.LD_LIBRARY_PATH or ""),
-          },
-          filetypes = { "swift", "objc", "objcpp" },
-          root_dir = function(filename)
-            -- Use vim.fs.root for better compatibility with newer nvim API
-            local markers = { 'Package.swift', '.git' }
-            local root = vim.fs.root(0, markers)
-            return root or vim.fn.getcwd()
-          end,
-          settings = {
-            sourcekit = {
-              -- Enable semantic highlighting
-              semanticHighlighting = true,
-              -- Customize indexing
-              indexing = {
-                enabled = true,
-              },
-            },
-          },
-        },
-
+        gopls = {},
         -- JavaScript/TypeScript
-        ts_ls = {
-          settings = {
-            typescript = {
-              preferences = {
-                disableSuggestions = false,
-              }
-            }
-          }
+        ts_ls = {},
+        -- Swift (requires sourcekit-lsp on PATH)
+        sourcekit = {
+          cmd = { 'sourcekit-lsp' },
+          filetypes = { 'swift' },
         },
-
-        -- Markdown
-        marksman = {},
       }
 
       -- Ensure the servers and tools above are installed
       --
-      --  To check the current status of installed tools and/or manually install
-      --  other tools, you can run
+      -- To check the current status of installed tools and/or manually install
+      -- other tools, you can run
       --    :Mason
       --
-      --  You can press `g?` for help in this menu.
-      -- Note: Use Mason package names, not lspconfig names
-      -- sourcekit is excluded (installed separately with Swift toolchain)
+      -- You can press `g?` for help in this menu.
+      -- Note: Mason package names differ from lspconfig names
+      -- sourcekit is not available via Mason (comes with Swift toolchain)
       local ensure_installed = {
-        'lua-language-server', -- Lua Language server (lspconfig name: lua_ls)
-        'stylua',              -- Used to format Lua code
-        'pyright',             -- Python LSP
-        'gopls',               -- Go LSP
-        'typescript-language-server', -- TypeScript/JavaScript LSP (lspconfig name: ts_ls)
-        'marksman',            -- Markdown LSP
-        'black',               -- Python formatter
-        'gofumpt',             -- Go formatter
-        'prettier',            -- JS/TS/Markdown formatter
+        'lua-language-server', -- lua_ls
+        'stylua',
+        'pyright',
+        'gopls',
+        'typescript-language-server', -- ts_ls
       }
 
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
@@ -806,7 +702,7 @@ require('lazy').setup({
             workspace = {
               checkThirdParty = false,
               -- NOTE: this is a lot slower and will cause issues when working on your own configuration.
-              --   See https://github.com/neovim/nvim-lspconfig/issues/3189
+              --  See https://github.com/neovim/nvim-lspconfig/issues/3189
               library = vim.api.nvim_get_runtime_file('', true),
             },
           })
@@ -816,44 +712,6 @@ require('lazy').setup({
         },
       })
       vim.lsp.enable 'lua_ls'
-
-      -- ============================================================================
-      -- Swift LSP Auto-start
-      -- Since sourcekit is not managed by Mason, we use an autocommand to start it
-      -- ============================================================================
-      vim.api.nvim_create_autocmd('FileType', {
-        pattern = { 'swift', 'objc', 'objcpp' },
-        callback = function(args)
-          -- Check if sourcekit-lsp is already attached to this buffer
-          local clients = vim.lsp.get_clients({ bufnr = args.buf, name = 'sourcekit' })
-          if #clients > 0 then
-            return  -- Already attached
-          end
-
-          -- Find root directory
-          local root_markers = { 'Package.swift', '.git' }
-          local root = vim.fs.root(args.buf, root_markers) or vim.fn.getcwd()
-
-          -- Start sourcekit-lsp
-          vim.lsp.start({
-            name = 'sourcekit',
-            cmd = { '/home/dave/.local/swift/usr/bin/sourcekit-lsp' },
-            cmd_env = {
-              LD_LIBRARY_PATH = '/home/dave/.local/lib:' .. (vim.env.LD_LIBRARY_PATH or ''),
-            },
-            root_dir = root,
-            capabilities = capabilities,
-            filetypes = { 'swift', 'objc', 'objcpp' },
-            settings = {
-              sourcekit = {
-                semanticHighlighting = true,
-                indexing = { enabled = true },
-              },
-            },
-          }, { bufnr = args.buf })
-        end,
-        desc = 'Start sourcekit-lsp for Swift files',
-      })
     end,
   },
 
@@ -892,14 +750,6 @@ require('lazy').setup({
         --
         -- You can use 'stop_after_first' to run the first available formatter from the list
         -- javascript = { "prettierd", "prettier", stop_after_first = true },
-        -- ============================================================================
-        -- MERGED: Additional formatter configurations
-        -- ============================================================================
-        python = { 'black' },
-        go = { 'gofumpt' },
-        javascript = { 'prettier' },
-        typescript = { 'prettier' },
-        markdown = { 'prettier' },
       },
     },
   },
@@ -934,14 +784,14 @@ require('lazy').setup({
         opts = {},
       },
     },
-    ---@module 'blink.cmp'
-    ---@type blink.cmp.Config
+    --- @module 'blink.cmp'
+    --- @type blink.cmp.Config
     opts = {
       keymap = {
         -- 'default' (recommended) for mappings similar to built-in completions
         --   <c-y> to accept ([y]es) the completion.
-        --     This will auto-import if your LSP supports it.
-        --     This will expand snippets if the LSP sent a snippet.
+        --    This will auto-import if your LSP supports it.
+        --    This will expand snippets if the LSP sent a snippet.
         -- 'super-tab' for tab to accept
         -- 'enter' for enter to accept
         -- 'none' for no mappings
@@ -952,17 +802,17 @@ require('lazy').setup({
         -- No, but seriously. Please read `:help ins-completion`, it is really good!
         --
         -- All presets have the following mappings:
-        --   <tab>/<s-tab>: move to right/left of your snippet expansion
-        --   <c-space>: Open menu or open docs if already open
-        --   <c-n>/<c-p> or <up>/<down>: Select next/previous item
-        --   <c-e>: Hide menu
-        --   <c-k>: Toggle signature help
+        -- <tab>/<s-tab>: move to right/left of your snippet expansion
+        -- <c-space>: Open menu or open docs if already open
+        -- <c-n>/<c-p> or <up>/<down>: Select next/previous item
+        -- <c-e>: Hide menu
+        -- <c-k>: Toggle signature help
         --
         -- See :h blink-cmp-config-keymap for defining your own keymap
         preset = 'default',
 
         -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
-        -- https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
+        --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
       },
 
       appearance = {
@@ -1009,15 +859,7 @@ require('lazy').setup({
       require('tokyonight').setup {
         styles = {
           comments = { italic = false }, -- Disable italics in comments
-          -- ============================================================================
-          -- MERGED: Additional style tweaks for mobile terminals
-          -- ============================================================================
-          keywords = { italic = false },
         },
-        -- ============================================================================
-        -- MERGED: Use night style for better mobile terminal compatibility
-        -- ============================================================================
-        style = 'night',
       }
 
       -- Load the colorscheme here.
@@ -1052,43 +894,35 @@ require('lazy').setup({
       --  You could remove this setup call if you don't like it,
       --  and try some other statusline plugin
       local statusline = require 'mini.statusline'
+      -- set use_icons to true if you have a Nerd Font
+      statusline.setup { use_icons = vim.g.have_nerd_font }
 
-      -- ============================================================================
-      -- MERGED: Mobile-responsive statusline configuration
-      -- ============================================================================
-      statusline.setup({ 
-        use_icons = false,  -- Better compatibility
-        content = {
-          active = function()
-            local mode = statusline.section_mode({ trunc_width = 120 })
-            local filename = statusline.section_filename({ trunc_width = 140 })
-            local location = statusline.section_location({ trunc_width = 75 })
+      -- You can configure sections in the statusline by overriding their
+      -- default behavior. For example, here we set the section for
+      -- cursor location to LINE:COLUMN
+      ---@diagnostic disable-next-line: duplicate-set-field
+      statusline.section_location = function() return '%2l:%-2v' end
 
-            -- Minimal statusline for phone
-            if is_phone then
-              return statusline.combine_groups({
+      -- Mobile-responsive statusline
+      if is_phone then
+        statusline.setup {
+          use_icons = false,
+          content = {
+            active = function()
+              local mode = statusline.section_mode { trunc_width = 120 }
+              local filename = statusline.section_filename { trunc_width = 140 }
+              local location = statusline.section_location { trunc_width = 75 }
+              return statusline.combine_groups {
                 { strings = { mode } },
-                '%<',  -- Truncation point
-                { strings = { filename } },
-                '%=',  -- Right align
-                { strings = { location } },
-              })
-            else
-              -- Full statusline for tablet/desktop
-              local git = statusline.section_git({ trunc_width = 75 })
-              local diagnostics = statusline.section_diagnostics({ trunc_width = 75 })
-              return statusline.combine_groups({
-                { strings = { mode } },
-                { strings = { git, diagnostics } },
                 '%<',
                 { strings = { filename } },
                 '%=',
                 { strings = { location } },
-              })
-            end
-          end,
-        },
-      })
+              }
+            end,
+          },
+        }
+      end
 
       -- ... and there is more!
       --  Check out: https://github.com/nvim-mini/mini.nvim
@@ -1100,16 +934,8 @@ require('lazy').setup({
     build = ':TSUpdate',
     main = 'nvim-treesitter.configs',
     opts = {
-      ensure_installed = {
-        'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc',
-        -- ============================================================================
-        -- MERGED: Additional treesitter parsers for mobile development
-        -- Note: Swift parser has compatibility issues with tree-sitter 0.26+
-        -- LSP provides syntax support, tree-sitter optional
-        -- ============================================================================
-        'python', 'go', 'javascript', 'typescript',
-      },
-      auto_install = false,  -- Disabled to prevent Swift parser install issues
+      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'python', 'go', 'javascript', 'typescript' },
+      auto_install = false,
       highlight = { enable = true },
       indent = { enable = true },
     },
@@ -1135,7 +961,7 @@ require('lazy').setup({
   --    This is the easiest way to modularize your config.
   --
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-  --    { import = 'custom.plugins' },
+  -- { import = 'custom.plugins' },
   --
   -- For additional information with loading, sourcing and examples see `:help lazy.nvim-🔌-plugin-spec`
   -- Or use telescope!
@@ -1161,43 +987,15 @@ require('lazy').setup({
       lazy = '💤 ',
     },
   },
-  -- ============================================================================
-  -- MERGED: Performance optimizations for remote development
-  -- ============================================================================
   performance = {
     rtp = {
       disabled_plugins = {
-        "gzip", "matchit", "matchparen", "netrwPlugin", "tarPlugin", 
-        "tohtml", "tutor", "zipPlugin",
+        'gzip', 'matchit', 'matchparen', 'netrwPlugin', 'tarPlugin',
+        'tohtml', 'tutor', 'zipPlugin',
       },
     },
   },
 })
-
--- ============================================================================
--- [[ MERGED: Language Server Installation Instructions ]]
--- ============================================================================
---[[
-To install the language servers, run these commands on your server:
-
-# Python
-npm install -g pyright
-
-# Go (requires Go to be installed)
-go install golang.org/x/tools/gopls@latest
-
-# Swift (macOS/Linux with Swift toolchain)
-# sourcekit-lsp comes with Swift toolchain
-
-# JavaScript/TypeScript
-npm install -g typescript-language-server typescript
-
-# Markdown
-npm install -g @artempyanykh/marksman
-
-# Or use Mason to install them:
-:Mason
---]]
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
