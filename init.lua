@@ -932,13 +932,24 @@ require('lazy').setup({
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
-    main = 'nvim-treesitter.configs',
-    opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'python', 'go', 'javascript', 'typescript' },
-      auto_install = false,
-      highlight = { enable = true },
-      indent = { enable = true },
-    },
+    lazy = false,
+    config = function()
+      require('nvim-treesitter').install {
+        'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline',
+        'query', 'vim', 'vimdoc', 'python', 'go', 'javascript', 'typescript',
+      }
+
+      vim.api.nvim_create_autocmd('FileType', {
+        pattern = {
+          'bash', 'sh', 'c', 'diff', 'html', 'lua', 'markdown',
+          'query', 'vim', 'help', 'python', 'go', 'javascript', 'typescript',
+        },
+        callback = function()
+          vim.treesitter.start()
+          vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+        end,
+      })
+    end,
   },
 
   -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
