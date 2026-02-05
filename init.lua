@@ -931,23 +931,17 @@ require('lazy').setup({
 
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
+    branch = 'main',
     build = ':TSUpdate',
-    lazy = false,
     config = function()
-      require('nvim-treesitter').install {
+      local filetypes = {
         'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline',
-        'query', 'vim', 'vimdoc', 'python', 'go', 'javascript', 'typescript',
+        'query', 'vim', 'vimdoc', 'python', 'go', 'javascript', 'typescript', 'swift',
       }
-
+      require('nvim-treesitter').install(filetypes)
       vim.api.nvim_create_autocmd('FileType', {
-        pattern = {
-          'bash', 'sh', 'c', 'diff', 'html', 'lua', 'markdown',
-          'query', 'vim', 'help', 'python', 'go', 'javascript', 'typescript',
-        },
-        callback = function()
-          vim.treesitter.start()
-          vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
-        end,
+        pattern = filetypes,
+        callback = function() vim.treesitter.start() end,
       })
     end,
   },
